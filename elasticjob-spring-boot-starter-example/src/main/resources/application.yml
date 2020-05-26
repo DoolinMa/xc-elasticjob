@@ -19,3 +19,9 @@ spring:
             jobClass: org.xc.elasticjob.MyDataFlowJob
             overwrite: true
             streamingProcess: true
+        scriptJob:
+          - name: scripttest
+            cron: 0/1 * * * * ?
+            shardingTotalCount: 1
+            overwrite: true
+            scriptCommandLine: C:/Users/THTF/Desktop/test.bat

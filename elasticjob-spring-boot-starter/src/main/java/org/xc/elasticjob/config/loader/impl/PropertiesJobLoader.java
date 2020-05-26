@@ -4,6 +4,7 @@ import com.dangdang.ddframe.job.api.ElasticJob;
 import com.dangdang.ddframe.job.config.JobCoreConfiguration;
 import com.dangdang.ddframe.job.config.JobTypeConfiguration;
 import com.dangdang.ddframe.job.config.dataflow.DataflowJobConfiguration;
+import com.dangdang.ddframe.job.config.script.ScriptJobConfiguration;
 import com.dangdang.ddframe.job.config.simple.SimpleJobConfiguration;
 import com.dangdang.ddframe.job.event.JobEventConfiguration;
 import com.dangdang.ddframe.job.lite.api.listener.ElasticJobListener;
@@ -53,8 +54,7 @@ public class PropertiesJobLoader implements IJobLoader {
     }
 
     @Override
-    public void loadDataflowJobs(
-        List<DataFlowJobProperties> jobPropertiesList) {
+    public void loadDataflowJobs(List<DataFlowJobProperties> jobPropertiesList) {
         for (DataFlowJobProperties jobProp : jobPropertiesList) {
             //获取作业类型配置
             JobTypeConfiguration jobTypeConfiguration = new DataflowJobConfiguration(getJobCoreConfiguration(jobProp),jobProp.getJobClass(),jobProp.isStreamingProcess());
@@ -66,8 +66,29 @@ public class PropertiesJobLoader implements IJobLoader {
     @Override
     public void loadScriptJobs( List<ScriptJobProperties> jobPropertiesList) {
 
+        for (ScriptJobProperties jobProp : jobPropertiesList) {
+            //获取作业类型配置
+            JobTypeConfiguration jobTypeConfiguration = new ScriptJobConfiguration(getJobCoreConfiguration(jobProp),jobProp.getScriptCommandLine());
+            //获取Lite作业配置
+            registerJob(jobProp, jobTypeConfiguration);
+        }
     }
-    //添加任务到zookeeper中
+    //添加腳本任务到zookeeper中
+    private void registerJob(ScriptJobProperties jobProp, JobTypeConfiguration jobTypeConfiguration) {
+        //获取Lite作业配置
+        LiteJobConfiguration liteJobConfiguration = getLiteJobConfiguration(jobTypeConfiguration, jobProp);
+
+        JobEventConfiguration jobEventConfiguration = jobProp.getJobEventConfigurations();
+        //获取作业监听器
+        ElasticJobListener[] elasticJobListeners = jobProp.getListeners();
+        //注册作业
+        if (null == jobEventConfiguration) {
+            new SpringJobScheduler(null,zookeeperRegistryCenter, liteJobConfiguration, elasticJobListeners).init();
+        } else {
+            new SpringJobScheduler(null, zookeeperRegistryCenter, liteJobConfiguration, jobEventConfiguration, elasticJobListeners).init();
+        }
+    }
+    //添加simple和dataflow任务到zookeeper中
     private void registerJob(SimpleJobProperties jobProp, JobTypeConfiguration jobTypeConfiguration) {
         //获取Lite作业配置
         LiteJobConfiguration liteJobConfiguration = getLiteJobConfiguration(jobTypeConfiguration, jobProp);
