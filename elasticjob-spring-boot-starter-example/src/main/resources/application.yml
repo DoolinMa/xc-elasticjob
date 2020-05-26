@@ -1,0 +1,21 @@
+spring:
+  elastic:
+    job:
+      zookeeper:
+        serverLists: 172.10.12.21:2181
+        namespace: test-job
+      config:
+        simpleJob:
+          -
+            name: test
+            cron: 0/5 * * * * ?
+            shardingTotalCount: 3
+            jobClass: org.xc.elasticjob.MyJob
+            overwrite: true
+        dataFlowJob:
+          - name: dataflowtest
+            cron: 0/5 * * * * ?
+            shardingTotalCount: 1
+            jobClass: org.xc.elasticjob.MyDataFlowJob
+            overwrite: true
+            streamingProcess: true
