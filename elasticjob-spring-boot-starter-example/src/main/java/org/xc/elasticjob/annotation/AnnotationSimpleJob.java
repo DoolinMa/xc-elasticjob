@@ -6,7 +6,7 @@ import com.dangdang.ddframe.job.api.simple.SimpleJob;
 /**
  * @Author doolin
  */
-@SimpleElasticJob(name = "AnnotationSimpleJob",cron = "0/5 * * * * ?",overwrite = true)
+@SimpleElasticJob(name = "AnnotationSimpleJob",cron = "0/5 * * * * ?",overwrite = true,listener = {"org.xc.listener.MyListener"})
 public class AnnotationSimpleJob implements SimpleJob {
     @Override public void execute(ShardingContext shardingContext) {
 

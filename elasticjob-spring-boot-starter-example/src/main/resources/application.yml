@@ -2,7 +2,7 @@ spring:
   elastic:
     job:
       zookeeper:
-        serverLists: 172.10.12.21:2181
+        serverLists: localhost:2181
         namespace: test-job
       config:
         simpleJob:
@@ -12,6 +12,9 @@ spring:
             shardingTotalCount: 3
             jobClass: org.xc.elasticjob.MyJob
             overwrite: true
+            listeners:
+              - org.xc.elasticjob.listener.MyListener
+              - org.xc.elasticjob.listener.MyListener
         dataFlowJob:
           - name: dataflowtest
             cron: 0/5 * * * * ?
@@ -19,9 +22,11 @@ spring:
             jobClass: org.xc.elasticjob.MyDataFlowJob
             overwrite: true
             streamingProcess: true
+            disabled: true
         scriptJob:
           - name: scripttest
             cron: 0/1 * * * * ?
             shardingTotalCount: 1
             overwrite: true
             scriptCommandLine: C:/Users/THTF/Desktop/test.bat
+            disabled: true

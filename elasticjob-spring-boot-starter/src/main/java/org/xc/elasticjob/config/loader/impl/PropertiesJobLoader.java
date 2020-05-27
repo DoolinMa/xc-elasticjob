@@ -11,6 +11,8 @@ import com.dangdang.ddframe.job.lite.api.listener.ElasticJobListener;
 import com.dangdang.ddframe.job.lite.config.LiteJobConfiguration;
 import com.dangdang.ddframe.job.lite.spring.api.SpringJobScheduler;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import org.xc.elasticjob.config.JobConfig;
 import org.xc.elasticjob.config.loader.IJobLoader;
 import org.xc.elasticjob.config.properties.AbstractJobProperties;
@@ -32,6 +34,7 @@ import java.util.Optional;
 /**
  * @author doolin
  */
+@Slf4j
 public class PropertiesJobLoader implements IJobLoader {
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
     private ApplicationContext applicationContext;
@@ -80,7 +83,7 @@ public class PropertiesJobLoader implements IJobLoader {
 
         JobEventConfiguration jobEventConfiguration = jobProp.getJobEventConfigurations();
         //获取作业监听器
-        ElasticJobListener[] elasticJobListeners = jobProp.getListeners();
+        ElasticJobListener[] elasticJobListeners = creatElasticJobListeners(jobProp.getListeners());
         //注册作业
         if (null == jobEventConfiguration) {
             new SpringJobScheduler(null,zookeeperRegistryCenter, liteJobConfiguration, elasticJobListeners).init();
@@ -95,7 +98,7 @@ public class PropertiesJobLoader implements IJobLoader {
 
         JobEventConfiguration jobEventConfiguration = jobProp.getJobEventConfigurations();
         //获取作业监听器
-        ElasticJobListener[] elasticJobListeners = jobProp.getListeners();
+        ElasticJobListener[] elasticJobListeners = creatElasticJobListeners(jobProp.getListeners());
         //注册作业
         if (null == jobEventConfiguration) {
             new SpringJobScheduler(registerBean(jobProp.getName(), jobProp.getJobClass(), ElasticJob.class),
@@ -108,19 +111,18 @@ public class PropertiesJobLoader implements IJobLoader {
 
     private ElasticJobListener[] creatElasticJobListeners(List<String> jobListenerList) {
         List<ElasticJobListener> elasticJobListenerList = new ArrayList<>();
-        for (String jobListener : jobListenerList) {
-            try {
-                //@TODO 需要看下怎么获取实例
-                elasticJobListenerList.add((ElasticJobListener)Class.forName(jobListener).newInstance());
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+        if(jobListenerList!=null && !jobListenerList.isEmpty()){
+            for (String jobListener : jobListenerList) {
+                try {
+                    //@TODO 需要看下怎么获取实例
+                    elasticJobListenerList.add((ElasticJobListener)Class.forName(jobListener).newInstance());
+                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                    log.error("添加job监听listeners错误",e);
+                    e.printStackTrace();
+                }
             }
         }
-        ElasticJobListener[] elasticJobListeners = new ElasticJobListener[0];
+        ElasticJobListener[] elasticJobListeners = new ElasticJobListener[elasticJobListenerList.size()];
         elasticJobListenerList.toArray(elasticJobListeners);
         return elasticJobListeners;
     }

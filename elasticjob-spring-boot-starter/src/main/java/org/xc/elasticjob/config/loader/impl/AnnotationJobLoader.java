@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +89,7 @@ public class AnnotationJobLoader extends PropertiesJobLoader {
         dataFlowJobPropertie.setJobShardingStrategyClass(annotation.jobShardingStrategyClass());
         dataFlowJobPropertie.setReconcileIntervalMinutes(annotation.reconcileIntervalMinutes());
         dataFlowJobPropertie.setJobEventConfigurations(annotation.jobEventConfigurations());
-        dataFlowJobPropertie.setListeners(annotation.listener());
+        dataFlowJobPropertie.setListeners(Arrays.asList(annotation.listener()));
         dataFlowJobPropertie.setDisabled(annotation.disabled());
         dataFlowJobPropertie.setDistributedListener(annotation.distributedListener());
         dataFlowJobPropertie.setStartedTimeoutMilliseconds(annotation.startedTimeoutMilliseconds());
@@ -117,7 +118,7 @@ public class AnnotationJobLoader extends PropertiesJobLoader {
         simpleJobPropertie.setJobShardingStrategyClass(annotation.jobShardingStrategyClass());
         simpleJobPropertie.setReconcileIntervalMinutes(annotation.reconcileIntervalMinutes());
         simpleJobPropertie.setJobEventConfigurations(annotation.jobEventConfigurations());
-        simpleJobPropertie.setListeners(annotation.listener());
+        simpleJobPropertie.setListeners(Arrays.asList(annotation.listener()));
         simpleJobPropertie.setDisabled(annotation.disabled());
         simpleJobPropertie.setDistributedListener(annotation.distributedListener());
         simpleJobPropertie.setStartedTimeoutMilliseconds(annotation.startedTimeoutMilliseconds());

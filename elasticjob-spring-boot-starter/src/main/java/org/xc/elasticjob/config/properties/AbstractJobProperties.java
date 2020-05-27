@@ -4,6 +4,8 @@ import com.dangdang.ddframe.job.event.JobEventConfiguration;
 import com.dangdang.ddframe.job.lite.api.listener.ElasticJobListener;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Author doolin
  */
@@ -106,7 +108,7 @@ public abstract class AbstractJobProperties {
     /**
      * 前置后置任务监听实现类，需实现ElasticJobListener接口
      */
-    private ElasticJobListener[] listeners = new ElasticJobListener[0];
+    private List<String> listeners;
 
     /**
      * 作业是否禁止启动,可用于部署作业时，先禁止启动，部署结束后统一启动
@@ -138,7 +140,6 @@ public abstract class AbstractJobProperties {
      */
     private String executorServiceHandler = "com.dangdang.ddframe.job.executor.handler.impl.DefaultExecutorServiceHandler";
 
-    public  void setListeners(String listener){};
-
     public  void setJobEventConfigurations(String jobEventConfigurations){};
+
 }
